@@ -1,0 +1,37 @@
+== Invoice number generating for ActiveRecord
+
+The problem this gem tries to solve is that for bookkeeping, an uninterrupted sequence of
+invoice numbers is needed. There are, however, situations in which the database's auto
+incrementing id field won't do. For example:
+
+* Orders for a webshop should only get an invoice number if the order is actually paid.
+* The order in which record are made is different from the order in which invoices are
+  created, for example in case of a reservations system.
+
+This gem makes this stupid simple:
+
+    # as soon as order is paid, invoice_nr will be set
+    class Order < ActiveRecord::Base
+        has_invoice_number :invoice_nr, assign_if: ->(order) { order.paid? }
+    end
+
+    # manually assign an invoice number when the user finishes the reservation
+    class Reservation < ActiveRecord::Base
+        has_invoice_number :invoice_nr
+
+        def finish
+            assign_invoice_number
+            save
+        end
+    end
+
+    # both funky order and boring order will share the same sequence of invoice numbers
+    class FunkyOrder < ActiveRecord::Base
+        has_invoice_number :invoice_nr, assign_if: ->(order) { order.paid? }, invoice_number_sequence: :order
+    end
+    class BoringOrder < ActiveRecord::Base
+        has_invoice_number :invoice_nr, assign_if: ->(order) { order.paid? }, invoice_number_sequence: :order
+    end
+
+That's it. This gem could use some more flexibility and support for NoSQL databases, but
+hopefully it is usefull to some people as is.

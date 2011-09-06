@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.date             = '2011-09-06'
   s.description      = 'Create sequences of uninterrupted invoice numbers'
   s.summary          = 'Create sequences of uninterrupted invoice numbers'
-  s.extra_rdoc_files = [ 'README' ]
+  s.extra_rdoc_files = [ 'README.rdoc' ]
   s.files            = FileList['lib/**/*.rb', 'test/**/*'].to_a
-  s.rdoc_options     = ['--main', 'README']
+  s.rdoc_options     = ['--main', 'README.rdoc']
   s.require_paths    = ['lib']
   s.test_files       = FileList['test/*.rb'].to_a
   s.add_dependency             'activerecord', ['>= 0']

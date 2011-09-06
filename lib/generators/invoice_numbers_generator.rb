@@ -1,7 +1,7 @@
 require 'rails/generators'
 require 'rails/generators/migration'
 
-class InvoiceNumbersGenerator < Rails::Generator::Base
+class InvoiceNumbersGenerator < Rails::Generators::Base
   include Rails::Generators::Migration
 
   def self.source_root

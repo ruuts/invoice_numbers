@@ -19,7 +19,8 @@ module InvoiceNumbers
           transaction do
             if read_attribute( invoice_number_field ).blank? 
               if invoice_number_assign_if.nil? or invoice_number_assign_if.call(self)
-                write_attribute( invoice_number_field, Generator.next_invoice_number( invoice_number_sequence ) )
+                sequence = invoice_number_sequence.respond_to?(:call) ? invoice_number_sequence.call(self) : invoice_number_sequence
+                write_attribute( invoice_number_field, Generator.next_invoice_number( sequence ) )
               end
             end
           end

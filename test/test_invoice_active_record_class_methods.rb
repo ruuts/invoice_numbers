@@ -13,6 +13,11 @@ ActiveRecord::Schema.define :version => 1 do
     t.boolean :finished,    :default => false
     t.integer :invoice_nr
   end
+  create_table :invoices, :force => true do |t|
+    t.boolean :finished,    :default => false
+    t.integer :invoice_nr
+    t.string  :customer
+   end
 end
 
 class Order < ActiveRecord::Base
@@ -21,6 +26,35 @@ end
 
 class Reservation < ActiveRecord::Base
   has_invoice_number :invoice_nr, :invoice_number_sequence => :shared
+end
+
+class Invoice < ActiveRecord::Base
+  has_invoice_number :invoice_nr, :invoice_number_sequence => lambda { |invoice| "sequence_#{invoice.customer}" }
+end
+
+describe Invoice do
+  before do
+    @invoice = Invoice.new(:customer => "jan")
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.clean
+  end
+
+  it 'assigns an invoice number when forced' do
+    @invoice.assign_invoice_number
+    @invoice.save
+    @invoice.invoice_nr.must_equal 1
+  end
+
+  it 'uses the shared sequence' do
+    invoice2 = Invoice.new(:customer => "henk")
+    invoice2.assign_invoice_number
+    invoice2.invoice_nr.must_equal 1
+    invoice3 = Invoice.new(:customer => "henk")
+    invoice3.assign_invoice_number
+    invoice3.invoice_nr.must_equal 2
+    @invoice.assign_invoice_number
+    @invoice.invoice_nr.must_equal 1
+  end
 end
 
 describe Reservation do

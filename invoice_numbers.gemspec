@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name             = 'invoice_numbers'
-  s.version          = '0.0.2'
+  s.version          = '0.0.3'
 
   s.authors          = [ 'Rob Scheepmaker' ]
   s.email            = 'rob@rscheepmaker.nl'

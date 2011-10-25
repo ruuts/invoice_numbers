@@ -7,15 +7,15 @@ require File.dirname( __FILE__ ) + '/database_configuration'
 ActiveRecord::Schema.define :version => 1 do
   create_table :orders, :force => true do |t|
     t.boolean :finished,    :default => false
-    t.integer :invoice_nr
+    t.string :invoice_nr
   end
   create_table :reservations, :force => true do |t|
     t.boolean :finished,    :default => false
-    t.integer :invoice_nr
+    t.string :invoice_nr
   end
   create_table :invoices, :force => true do |t|
     t.boolean :finished,    :default => false
-    t.integer :invoice_nr
+    t.string :invoice_nr
     t.string  :customer
    end
 end
@@ -29,7 +29,7 @@ class Reservation < ActiveRecord::Base
 end
 
 class Invoice < ActiveRecord::Base
-  has_invoice_number :invoice_nr, :invoice_number_sequence => lambda { |invoice| "sequence_#{invoice.customer}" }
+  has_invoice_number :invoice_nr, :invoice_number_sequence => lambda { |invoice| "#{invoice.customer}" }, :prefix => true
 end
 
 describe Invoice do
@@ -42,18 +42,18 @@ describe Invoice do
   it 'assigns an invoice number when forced' do
     @invoice.assign_invoice_number
     @invoice.save
-    @invoice.invoice_nr.must_equal 1
+    @invoice.invoice_nr.must_equal "jan1"
   end
 
   it 'uses the shared sequence' do
     invoice2 = Invoice.new(:customer => "henk")
     invoice2.assign_invoice_number
-    invoice2.invoice_nr.must_equal 1
+    invoice2.invoice_nr.must_equal "henk1"
     invoice3 = Invoice.new(:customer => "henk")
     invoice3.assign_invoice_number
-    invoice3.invoice_nr.must_equal 2
+    invoice3.invoice_nr.must_equal "henk2"
     @invoice.assign_invoice_number
-    @invoice.invoice_nr.must_equal 1
+    @invoice.invoice_nr.must_equal "jan1"
   end
 end
 
@@ -72,14 +72,14 @@ describe Reservation do
   it 'assigns an invoice number when forced' do
     @reservation.assign_invoice_number
     @reservation.save
-    @reservation.invoice_nr.must_equal 1
+    @reservation.invoice_nr.must_equal 1.to_s
   end
 
   it 'uses the shared sequence' do
     InvoiceNumbers::Generator.next_invoice_number(:shared)
     InvoiceNumbers::Generator.next_invoice_number(:shared)
     @reservation.assign_invoice_number
-    @reservation.invoice_nr.must_equal 3
+    @reservation.invoice_nr.must_equal 3.to_s
   end
 end
 
@@ -98,16 +98,16 @@ describe Order do
   it 'assigns an invoice number when finished' do
     @order.finished = true
     @order.save
-    @order.invoice_nr.must_equal 1
+    @order.invoice_nr.must_equal 1.to_s
   end
 
   it 'does not update an invoice number once assigned' do
     @order.finished = true
     @order.save
-    @order.invoice_nr.must_equal 1
+    @order.invoice_nr.must_equal 1.to_s
     @order.invoice_nr_will_change! # force a new save
     @order.save
-    @order.invoice_nr.must_equal 1
+    @order.invoice_nr.must_equal 1.to_s
   end
 
   it 'uses the order sequence' do
@@ -115,6 +115,6 @@ describe Order do
     InvoiceNumbers::Generator.next_invoice_number(:order)
     @order.finished = true
     @order.assign_invoice_number
-    @order.invoice_nr.must_equal 3
+    @order.invoice_nr.must_equal 3.to_s
   end
 end

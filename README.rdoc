@@ -1,4 +1,4 @@
-== Invoice number generating for ActiveRecord
+== Invoice number generation for ActiveRecord or Mongoid
 
 The problem this gem tries to solve is that for bookkeeping, an uninterrupted sequence of
 invoice numbers is needed. There are, however, situations in which the database's auto
@@ -33,5 +33,14 @@ This gem makes this stupid simple:
         has_invoice_number :invoice_nr, assign_if: ->(order) { order.paid? }, invoice_number_sequence: :order
     end
 
-That's it. This gem could use some more flexibility and support for NoSQL databases, but
-hopefully it is usefull to some people as is.
+MongoDB is also supported through Mongoid, so if you don't use ActiveRecord, you can just do
+
+    class Order
+	include Mongoid::Document
+	include InvoiceNumbers::InvoiceNumbers
+	
+	field :invoice_nr, type: Integer
+
+        has_invoice_number :invoice_nr, assign_if: ->(order) { order.paid? }
+    end
+

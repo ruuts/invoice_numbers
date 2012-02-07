@@ -1,8 +1,9 @@
 require 'test/unit'
+require File.dirname( __FILE__ ) + '/database_configuration'
+require File.dirname( __FILE__ ) + '/database_schema'
 require 'database_cleaner'
 require 'minitest/spec'
 require 'invoice_numbers'
-require File.dirname( __FILE__ ) + '/database_configuration'
 
 describe InvoiceNumbers::Generator do
   before do

@@ -9,6 +9,7 @@ if ENV['orm'] == 'activerecord'
   ActiveRecord::Schema.define :version => 1 do
     create_table :orders, :force => true do |t|
       t.boolean :finished,    :default => false
+      t.string :dummy_nr
       t.string :invoice_nr
     end
     create_table :reservations, :force => true do |t|
@@ -24,6 +25,7 @@ if ENV['orm'] == 'activerecord'
 
   class Order < ActiveRecord::Base
     has_invoice_number :invoice_nr, :assign_if => lambda { |order| order.finished? }
+    has_invoice_number :dummy_nr,   :invoice_number_sequence => :dummy
   end
 
   class Reservation < ActiveRecord::Base
@@ -41,9 +43,11 @@ elsif ENV['orm'] == 'mongoid'
     include InvoiceNumbers::InvoiceNumbers
 
     field :finished, 	type: Boolean, default: false
+    field :dummy_nr, 	type: String
     field :invoice_nr, 	type: String
 
     has_invoice_number :invoice_nr, :assign_if => lambda { |order| order.finished? }
+    has_invoice_number :dummy_nr,   :invoice_number_sequence => :dummy
   end
 
   class Reservation
@@ -62,6 +66,7 @@ elsif ENV['orm'] == 'mongoid'
 
     field :finished, 	type: Boolean, default: false
     field :invoice_nr, 	type: String
+    field :dummy_nr, 	type: String
     field :customer, 	type: String
 
     has_invoice_number :invoice_nr, :invoice_number_sequence => lambda { |invoice| "#{invoice.customer}" }, :prefix => true
@@ -151,7 +156,7 @@ describe Order do
     InvoiceNumbers::Generator.next_invoice_number(:order)
     InvoiceNumbers::Generator.next_invoice_number(:order)
     @order.finished = true
-    @order.assign_invoice_number
+    @order.assign_invoice_nr
     @order.invoice_nr.must_equal 3.to_s
   end
 end

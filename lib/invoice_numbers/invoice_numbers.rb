@@ -13,10 +13,14 @@ module InvoiceNumbers
         invoice_number_prefix        = options[:prefix]
 
         if invoice_number_assign_if
-          before_save :assign_invoice_number
+          before_save :"assign_#{invoice_number_field}"
         end
 
         send(:define_method, :assign_invoice_number) do
+	  send("assign_#{invoice_number_field}")
+	end
+
+        send(:define_method, "assign_#{invoice_number_field}") do
 	  do_assign = Proc.new do
             if read_attribute( invoice_number_field ).blank? 
               if invoice_number_assign_if.nil? or invoice_number_assign_if.call(self)

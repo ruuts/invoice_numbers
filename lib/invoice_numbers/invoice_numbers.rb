@@ -17,22 +17,24 @@ module InvoiceNumbers
         end
 
         send(:define_method, :assign_invoice_number) do
-	  send("assign_#{invoice_number_field}")
-	end
+          send("assign_#{invoice_number_field}")
+        end
 
         send(:define_method, "assign_#{invoice_number_field}") do
-	  do_assign = Proc.new do
+          do_assign = Proc.new do
             if read_attribute( invoice_number_field ).blank? 
               if invoice_number_assign_if.nil? or invoice_number_assign_if.call(self)
                 sequence = invoice_number_sequence.respond_to?(:call) ? invoice_number_sequence.call(self) : invoice_number_sequence
                 write_attribute( invoice_number_field, "#{invoice_number_prefix ? sequence : ''}#{Generator.next_invoice_number( sequence )}" )
               end
             end
-	  end
+          end
 
           if respond_to?(:transaction)
-            transaction({}, &do_assign)
-	  else
+            transaction do
+              do_assign.call
+            end
+          else
             do_assign.call
           end
         end

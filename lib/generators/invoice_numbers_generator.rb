@@ -1,5 +1,4 @@
 require 'rails/generators'
-require 'rails/generators/migration'
 
 class InvoiceNumbersGenerator < Rails::Generators::Base
   include Rails::Generators::Migration
